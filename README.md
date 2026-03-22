@@ -1,0 +1,2 @@
+# UnityPlayModeSceneAutoBackup
+Playモード実行時、現在のシーンを別ファイルとしてバックアップする
