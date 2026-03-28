@@ -4,14 +4,14 @@ using UnityEngine;
 using UnityEngine.SceneManagement;
 
 [InitializeOnLoad]
-public class AutoSaveSceneOnPlay
+public class PlayModeSceneAutoBackup
 {
     private const string BACKUP_DIR = "Assets/PlayModeSceneAutoBackup/";
-    private const string TEMP_SCENE_PATH = "Assets/PlayModeSceneAutoBackup/__temp_backup_scene.unity";
-    static AutoSaveSceneOnPlay()
+
+    static PlayModeSceneAutoBackup()
     {
         EditorApplication.playModeStateChanged += PlayModeChange;
-        Debug.Log("[PlayModeAutoBackup]Script Loaded");
+        Debug.Log("[PlayModeSceneAutoBackup]Script Loaded");
     }
 
     private static void PlayModeChange(PlayModeStateChange PlayMode)
@@ -27,25 +27,15 @@ public class AutoSaveSceneOnPlay
             //シーン保存            
             Scene currentScene = SceneManager.GetActiveScene();
             EditorSceneManager.SaveScene(currentScene); //現在開いているシーンを上書き保存
-            string currentScenePath = currentScene.path; //現在開いているシーンのパス取得(tempから帰ってくるため必要)
+            string currentScenePath = currentScene.path; //現在開いているシーンのパス取得(別名保存から帰ってくるため必要)
             string backupFullPath = BACKUP_DIR + currentScene.name + "_AutoBackup.unity";
 
-            // ① 現在のシーンを一時保存（元シーンはそのまま）
-            EditorSceneManager.SaveScene(currentScene, TEMP_SCENE_PATH);
-
-            // ② tempシーンを開く
-            Scene tempScene = EditorSceneManager.OpenScene(TEMP_SCENE_PATH, OpenSceneMode.Single);
-
-            // ③ バックアップとして保存
-            EditorSceneManager.SaveScene(tempScene, backupFullPath);
-
-            // ④ 元のシーンを再度開く
+            //バックアップ保存
+            EditorSceneManager.SaveScene(currentScene, backupFullPath);
+            //元のシーンを再度開く
             EditorSceneManager.OpenScene(currentScenePath, OpenSceneMode.Single);
 
-            // ⑤ tempシーン削除
-            AssetDatabase.DeleteAsset(TEMP_SCENE_PATH);
-
-            Debug.Log("[PlayModeAutoBackup]Success\n"
+            Debug.Log("[PlayModeSceneAutoBackup]Success\n"
                 + "<color=green>" + backupFullPath + "</color>");
         }
     }
